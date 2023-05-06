@@ -1,12 +1,15 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchContacts, deleteContact } from 'redux/contactsSlice';
+import { fetchContacts, deleteContact } from 'redux/thunks';
+import { getContacts, getIsLoading, getFilter } from 'redux/selectors';
 import ContactListItem from 'components/ContactListItem/ContactListItem';
+import Loader from 'components/Loader/Loader';
 import css from './ContactList.module.css';
 
 const ContactList = () => {
-  const contactsFromStore = useSelector(state => state.contacts.items);
-  const filterQuery = useSelector(state => state.filter);
+  const contactsFromStore = useSelector(getContacts);
+  const isLoading = useSelector(getIsLoading);
+  const filterQuery = useSelector(getFilter);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -28,17 +31,20 @@ const ContactList = () => {
   }
 
   return (
-    <ul className={css['contact-list']}>
-      {filteredContacts.length > 0 &&
-        filteredContacts.map(contact => (
-          <li key={contact.id}>
-            <ContactListItem
-              contact={contact}
-              onDeleteContact={onDeleteContact}
-            />
-          </li>
-        ))}
-    </ul>
+    <>
+      <ul className={css['contact-list']}>
+        {filteredContacts.length > 0 &&
+          filteredContacts.map(contact => (
+            <li key={contact.id}>
+              <ContactListItem
+                contact={contact}
+                onDeleteContact={onDeleteContact}
+              />
+            </li>
+          ))}
+      </ul>
+      {isLoading && <Loader/>}
+    </>
   );
 }
 
